@@ -1362,11 +1362,29 @@ function submitEmail() {
     document.getElementById('email-note').style.color = '#c0392b';
     return;
   }
-  document.getElementById('email-note').textContent = '✓ Got it! Your report is on its way.';
+  // Submit to Google Form
+  var formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScoYq7qt9QJ2wM7lKOaOT2Lu5ahO0uxMXwQWXWW2fR_5WgPsw/formResponse';
+  var fieldId = 'entry.598292468'; // Email Address field
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.name = 'hidden-form-target';
+  document.body.appendChild(iframe);
+  var form = document.createElement('form');
+  form.action = formUrl;
+  form.method = 'POST';
+  form.target = 'hidden-form-target';
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = fieldId;
+  input.value = email;
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  document.getElementById('email-note').textContent = '✓ You\'re on the list! Check your inbox soon.';
   document.getElementById('email-note').style.color = 'var(--gold)';
   document.getElementById('email-input').disabled = true;
   document.querySelector('.btn-email').disabled = true;
-  document.querySelector('.btn-email').textContent = 'Sent!';
+  document.querySelector('.btn-email').textContent = 'Submitted!';
 }
 
 function copyResults() {
