@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FranchiseIQ — Franchise Fit Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0f0e0c;--paper:#faf8f4;--cream:#f2ede4;--warm:#e8e3da;
+  --gold:#c9a84c;--gold-lt:#f0e4bb;--gold-dk:#8a6e2f;
+  --sage:#4a6741;--sage-lt:#e8efe7;
+  --red:#c0392b;--red-lt:#fdf2f1;
+  --amber:#ba7517;--amber-lt:#faeeda;
+  --blue:#1a3a5c;--blue-lt:#e8f0f8;
+  --border:rgba(15,14,12,.10);--border-m:rgba(15,14,12,.18);
+  --shadow:0 2px 16px rgba(15,14,12,.07);
+  --r:10px;--rl:16px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+
+header{background:var(--ink);border-bottom:2px solid var(--gold);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:14px;color:var(--ink)}
+.logo-text{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#fff}
+.logo-text em{color:var(--gold);font-style:normal}
+.hbadge{font-size:11px;font-weight:500;color:var(--gold);border:1px solid rgba(201,168,76,.4);padding:4px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase}
+
+.hero{background:var(--ink);padding:2.5rem 2rem 2rem}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;color:#fff;line-height:1.2;margin-bottom:.5rem}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{color:rgba(255,255,255,.5);font-size:14px;font-weight:300;max-width:520px}
+
+main{max-width:720px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+
+.progress-wrap{margin-bottom:2rem}
+.progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.progress-label{font-size:12px;color:rgba(15,14,12,.5);font-weight:500}
+.progress-count{font-family:'DM Mono',monospace;font-size:12px;color:rgba(15,14,12,.4)}
+.progress-track{height:4px;background:var(--warm);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+.q-card{background:#fff;border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow);overflow:hidden;animation:slideIn .35s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.q-card-hdr{padding:1.5rem 1.75rem 1.25rem;border-bottom:1px solid var(--border)}
+.q-category{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(15,14,12,.4);margin-bottom:.5rem}
+.q-text{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:600;color:var(--ink);line-height:1.4}
+.q-subtext{font-size:13px;color:rgba(15,14,12,.5);margin-top:.4rem}
+
+.q-options{padding:1.25rem 1.75rem;display:flex;flex-direction:column;gap:.625rem}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border:1.5px solid var(--border-m);border-radius:var(--r);cursor:pointer;transition:all .15s;user-select:none}
+.opt:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.opt.selected{border-color:var(--ink);background:var(--ink)}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--border-m);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.opt.selected .opt-radio{border-color:var(--gold);background:var(--gold)}
+.opt-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;display:none}
+.opt.selected .opt-radio::after{display:block}
+.opt-content{flex:1}
+.opt-label{font-size:14px;font-weight:500;color:var(--ink);transition:color .15s}
+.opt.selected .opt-label{color:#fff}
+.opt-desc{font-size:12px;color:rgba(15,14,12,.5);margin-top:2px;transition:color .15s;line-height:1.5}
+.opt.selected .opt-desc{color:rgba(255,255,255,.6)}
+
+.q-nav{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.75rem;border-top:1px solid var(--border);background:var(--cream)}
+.btn-back{padding:9px 16px;border:1px solid var(--border-m);border-radius:var(--r);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:rgba(15,14,12,.6);transition:all .15s}
+.btn-back:hover{background:#fff;color:var(--ink)}
+.btn-back:disabled{opacity:.3;cursor:not-allowed}
+.btn-next{padding:10px 22px;border:none;border-radius:var(--r);background:var(--ink);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-next:hover:not(:disabled){background:#1a1917;transform:translateY(-1px);box-shadow:0 4px 16px rgba(15,14,12,.2)}
+.btn-next:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+.loading{display:none;text-align:center;padding:3rem 1.5rem;background:#fff;border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--shadow)}
+.loading.show{display:block}
+.spinner{width:46px;height:46px;border:3px solid var(--cream);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1.25rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:600;margin-bottom:.4rem}
+.load-steps{display:flex;flex-direction:column;gap:5px;max-width:280px;margin:.875rem auto 0;text-align:left}
+.lstep{font-size:12px;color:rgba(15,14,12,.4);padding:5px 10px;border-radius:6px;transition:all .3s;display:flex;align-items:center;gap:7px}
+.lstep::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.lstep.active{color:var(--ink);background:var(--sage-lt);font-weight:500}
+.lstep.done{color:var(--sage)}
+
+#results{display:none}
+#results.show{display:flex;flex-direction:column;gap:1.25rem}
+
+.profile-card{background:var(--ink);border-radius:var(--rl);padding:1.75rem;overflow:hidden;position:relative}
+.profile-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(201,168,76,.12) 0%,transparent 70%);pointer-events:none}
+.profile-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35);margin-bottom:.625rem}
+.profile-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--gold);margin-bottom:.5rem;line-height:1.2}
+.profile-tagline{font-size:14px;color:rgba(255,255,255,.6);line-height:1.6;margin-bottom:1.25rem;max-width:480px}
+.profile-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.25rem}
+.ptag{font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid rgba(201,168,76,.35);color:var(--gold-lt);background:rgba(201,168,76,.1)}
+.score-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.score-tile{background:rgba(255,255,255,.06);border-radius:var(--r);padding:.875rem 1rem;border:1px solid rgba(255,255,255,.08)}
+.score-tile-lbl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.score-tile-val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:#fff}
+.score-tile-sub{font-size:10px;color:rgba(255,255,255,.3);margin-top:2px}
+
+.panel{background:#fff;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow)}
+.panel-hdr{padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.panel-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.panel-title{font-size:13px;font-weight:600;color:var(--ink)}
+
+.sector-grid{padding:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.sector-card{border:1.5px solid var(--border-m);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .15s}
+.sector-card:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.sector-card.top{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.sector-top-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold-dk);background:var(--gold-lt);padding:2px 8px;border-radius:20px;display:inline-block;margin-bottom:.5rem}
+.sector-icon{font-size:20px;margin-bottom:.4rem}
+.sector-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.sector-desc{font-size:11px;color:rgba(15,14,12,.5);line-height:1.5;margin-bottom:.5rem}
+.sector-match{display:flex;align-items:center;gap:6px}
+.match-bar-track{flex:1;height:5px;background:var(--cream);border-radius:3px;overflow:hidden}
+.match-bar-fill{height:100%;border-radius:3px;background:var(--sage)}
+.match-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--sage)}
+
+.brand-list{list-style:none;padding:0}
+.brand-item{display:flex;align-items:flex-start;gap:12px;padding:1rem 1.25rem;border-bottom:1px solid var(--border);transition:background .15s}
+.brand-item:last-child{border-bottom:none}
+.brand-item:hover{background:rgba(242,237,228,.4)}
+.brand-rank{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.brand-rank.r1{background:var(--gold);color:var(--ink)}
+.brand-rank.r2{background:var(--warm);color:var(--ink)}
+.brand-rank.r3{background:var(--cream);color:var(--ink)}
+.brand-rank.rx{background:var(--cream);color:rgba(15,14,12,.45)}
+.brand-info{flex:1}
+.brand-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.brand-sector{font-size:11px;color:rgba(15,14,12,.45);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.brand-why{font-size:12px;color:rgba(15,14,12,.6);line-height:1.5}
+.brand-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.bmeta{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--cream);color:rgba(15,14,12,.55)}
+.brand-score{text-align:right;flex-shrink:0}
+.brand-score-num{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--ink)}
+.brand-score-lbl{font-size:10px;color:rgba(15,14,12,.35);text-transform:uppercase;letter-spacing:.05em}
+
+.advice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;padding:1.25rem}
+.advice-card{background:var(--cream);border-radius:var(--r);padding:.875rem 1rem}
+.advice-icon{font-size:18px;margin-bottom:.375rem}
+.advice-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.advice-body{font-size:12px;color:rgba(15,14,12,.6);line-height:1.55}
+
+.export-strip{display:flex;gap:.75rem;flex-wrap:wrap;padding:1rem 1.25rem;border-top:1px solid var(--border);background:var(--cream)}
+.btn{padding:9px 16px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.btn-primary{background:var(--ink);color:#fff;border:none}
+.btn-primary:hover{background:#1a1917;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--border-m)}
+.btn-outline:hover{background:#fff;border-color:var(--ink)}
+.disclaimer{font-size:11px;color:rgba(15,14,12,.4);line-height:1.6;padding:.875rem 1.25rem;border-top:1px solid var(--border)}
+
+.email-capture{background:linear-gradient(135deg,var(--ink) 0%,#1a1917 100%);border-radius:var(--rl);padding:1.75rem;text-align:center}
+.email-capture h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.2rem;margin-bottom:.375rem}
+.email-capture p{color:rgba(255,255,255,.55);font-size:13px;margin-bottom:1.25rem}
+.email-form{display:flex;gap:8px;max-width:420px;margin:0 auto}
+.email-input{flex:1;padding:10px 14px;border:1.5px solid rgba(201,168,76,.3);border-radius:var(--r);background:rgba(255,255,255,.08);color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.email-input::placeholder{color:rgba(255,255,255,.3)}
+.email-input:focus{border-color:var(--gold)}
+.btn-email{padding:10px 18px;background:var(--gold);color:var(--ink);border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn-email:hover{background:var(--gold-lt)}
+.email-note{font-size:11px;color:rgba(255,255,255,.3);margin-top:.75rem}
+
+@media(max-width:600px){
+  header{padding:0 1rem}
+  .hero{padding:1.75rem 1rem 1.5rem}
+  main{padding:1.5rem 1rem 3rem}
+  .q-card-hdr,.q-options,.q-nav{padding-left:1.25rem;padding-right:1.25rem}
+  .sector-grid{grid-template-columns:1fr}
+  .advice-grid{grid-template-columns:1fr}
+  .email-form{flex-direction:column}
+  .score-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="logo">
+    <div class="logo-mark">FQ</div>
+    <span class="logo-text">Franchise<em>IQ</em></span>
+  </a>
+  <span class="hbadge">Fit Quiz</span>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Find your franchise match</div>
+  <h1>Which franchise is <em>right for you?</em></h1>
+  <p>Answer 10 questions about your capital, personality, work style, and goals. We'll match you across 85+ franchise brands to find the ones that actually fit your profile.</p>
+</div>
+
+<main>
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-top">
+      <span class="progress-label" id="progress-label">Question 1 of 10</span>
+      <span class="progress-count" id="progress-count">0% complete</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div id="quiz-wrap"></div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="load-title">Finding your franchise matches…</div>
+    <div style="font-size:13px;color:rgba(15,14,12,.45)">Analyzing your profile across 85+ franchise brands</div>
+    <div class="load-steps">
+      <div class="lstep" id="ls1">Scoring your investor profile</div>
+      <div class="lstep" id="ls2">Matching personality to franchise types</div>
+      <div class="lstep" id="ls3">Filtering by capital &amp; risk tolerance</div>
+      <div class="lstep" id="ls4">Ranking brand compatibility</div>
+      <div class="lstep" id="ls5">Building your recommendation report</div>
+    </div>
+  </div>
+
+  <div id="results"></div>
+</main>
+
+<script>
+// ── QUESTIONS ──
+var QUESTIONS = [
+  {
+    id:'capital',
+    category:'Financial readiness',
+    text:'How much liquid capital can you invest?',
+    sub:'This is cash you can put in — not counting loans or financing.',
+    options:[
+      {val:'under150', label:'Under $150,000',       desc:'Lower-investment service or B2B concepts'},
+      {val:'150to350', label:'$150,000 – $350,000',  desc:'Mid-range service or B2B franchises'},
+      {val:'350to750', label:'$350,000 – $750,000',  desc:'Most QSR, automotive, and fitness concepts'},
+      {val:'750plus',  label:'Over $750,000',         desc:'Premium concepts, large-format, or multi-unit'},
+    ]
+  },
+  {
+    id:'risk',
+    category:'Risk tolerance',
+    text:'How do you feel about financial risk?',
+    sub:"Be honest — there's no wrong answer.",
+    options:[
+      {val:'low',      label:'I prefer low risk',                   desc:'I need predictable, proven systems with strong track records'},
+      {val:'medium',   label:"I'm comfortable with moderate risk",  desc:'I can handle some uncertainty for better upside'},
+      {val:'high',     label:"I'm a calculated risk-taker",         desc:"I'm willing to bet on newer or faster-growing brands"},
+      {val:'very_high',label:'I embrace high risk for high reward', desc:'Emerging brands or first-mover opportunities excite me'},
+    ]
+  },
+  {
+    id:'involvement',
+    category:'Lifestyle & involvement',
+    text:'How hands-on do you want to be in your franchise day-to-day?',
+    sub:'This shapes which franchise models will actually work for you.',
+    options:[
+      {val:'owner_operator', label:'Fully hands-on owner-operator', desc:'I want to be in the business daily — this is my primary job'},
+      {val:'semi_active',    label:'Semi-active owner',             desc:"I'll manage but hire people to run day-to-day operations"},
+      {val:'semi_absentee',  label:'Semi-absentee',                 desc:'I want to check in weekly and have strong management in place'},
+      {val:'investor',       label:'Pure investor',                 desc:'I want a business that mostly runs itself with minimal my involvement'},
+    ]
+  },
+  {
+    id:'personality',
+    category:'Personality style',
+    text:'Which description best fits how you naturally work?',
+    sub:"This is your personality style — used to match franchise types where you'll thrive.",
+    options:[
+      {val:'D', label:'Driver — decisive, goal-oriented, competitive',      desc:'You make fast decisions, love challenges, and want to win. High energy.'},
+      {val:'I', label:'Influencer — outgoing, persuasive, relationship-focused', desc:'You build relationships easily, love selling, and motivate others.'},
+      {val:'S', label:'Steady — reliable, methodical, team-focused',        desc:'You value stability, follow systems well, and build loyal teams.'},
+      {val:'C', label:'Analytical — detail-oriented, precise, quality-focused', desc:'You love research, data, and getting things exactly right before acting.'},
+    ]
+  },
+  {
+    id:'sales',
+    category:'Sales comfort',
+    text:'How comfortable are you with sales and business development?',
+    sub:'Many franchise types depend heavily on your ability to sell.',
+    options:[
+      {val:'love_sales',    label:"I love selling — it's my strength",      desc:'I actively enjoy prospecting, pitching, and closing new clients'},
+      {val:'comfortable',   label:"I'm comfortable with sales",             desc:"I can sell when needed, though it's not my natural first instinct"},
+      {val:'some_training', label:'I can learn with the right training',     desc:'I need a solid system and support to become effective at sales'},
+      {val:'avoid_sales',   label:'I prefer operations over sales',          desc:"I'd rather manage systems and operations than sell directly"},
+    ]
+  },
+  {
+    id:'sector_interest',
+    category:'Industry preference',
+    text:'Which type of business excites you most?',
+    sub:'Pick the one that genuinely appeals to you — passion matters.',
+    options:[
+      {val:'food',     label:'Food & beverage',          desc:'Restaurants, coffee, QSR, fast casual'},
+      {val:'services', label:'Home & business services', desc:'Cleaning, repair, maintenance, home improvement'},
+      {val:'health',   label:'Health, fitness & wellness',desc:'Gyms, studios, senior care, medical'},
+      {val:'b2b',      label:'B2B & professional services',desc:'Marketing, signage, consulting, education'},
+    ]
+  },
+  {
+    id:'people',
+    category:'Team & people',
+    text:'What kind of team do you want to manage?',
+    sub:'Different franchises require very different staffing models.',
+    options:[
+      {val:'no_staff',    label:'Solo or 1–2 people',desc:'I prefer minimal staff — low overhead, direct control'},
+      {val:'small_team',  label:'Small team of 3–8', desc:"I'm comfortable managing a small, close-knit crew"},
+      {val:'medium_team', label:'Team of 10–25',      desc:'I can manage a larger operation with department leads'},
+      {val:'large_team',  label:'50+ employees',      desc:'I have experience leading large organizations'},
+    ]
+  },
+  {
+    id:'timeline',
+    category:'Goals & timeline',
+    text:"What's your primary goal for owning a franchise?",
+    sub:'This helps match you to the right franchise structure and payout model.',
+    options:[
+      {val:'income',     label:'Replace or supplement my income',   desc:'I need consistent monthly cash flow from day one'},
+      {val:'wealth',     label:'Build long-term wealth',            desc:"I'm focused on growing equity and franchise value over 5–10 years"},
+      {val:'multi_unit', label:'Build a multi-unit portfolio',      desc:'I want to own 3–10 locations within a few years'},
+      {val:'legacy',     label:'Create a family business or legacy',desc:'I want something I can pass down or run for decades'},
+    ]
+  },
+  {
+    id:'location',
+    category:'Location & model',
+    text:'What kind of physical business model do you prefer?',
+    options:[
+      {val:'retail',  label:'Retail / storefront location',     desc:'A physical location customers come to — visibility and foot traffic matter'},
+      {val:'mobile',  label:'Mobile or home-based',             desc:'No fixed location needed — go to the customer or work from home'},
+      {val:'office',  label:'Small office or light commercial', desc:'Professional office space, B2B model, minimal retail'},
+      {val:'no_pref', label:'No strong preference',             desc:"I'm open to any model if the economics are right"},
+    ]
+  },
+  {
+    id:'experience',
+    category:'Background',
+    text:"What's your professional background?",
+    sub:'Your experience shapes which sectors you\'ll ramp up in fastest.',
+    options:[
+      {val:'corporate',  label:'Corporate / management',         desc:'Business management, operations, finance, or executive background'},
+      {val:'sales_mktg', label:'Sales & marketing',             desc:'B2B sales, marketing, advertising, or customer-facing roles'},
+      {val:'trades',     label:'Trades or technical skills',    desc:'Contracting, automotive, technical, or hands-on trades experience'},
+      {val:'service',    label:'Service industry or healthcare',desc:'Restaurant, hospitality, healthcare, education, or care-giving'},
+    ]
+  },
+];
+
+// ── BRAND DATABASE ──────────────────────────────────────────────────────────
+// Schema: name, sector (display), quiz_sector (food/services/health/b2b),
+//   invest:[min,max in $K], royalty (%), item19, ratio (capital:EBITDA or null),
+//   involvement: array of compatible levels
+//   personality: best DiSC fits  salesDriven: bool  teamSize: solo/small/medium/large
+//   models: array (retail/mobile/office/flex)  experience: array  risk: low/med/high/vhigh
+//   tags: []
+
+var BRANDS = [
+
+  // ── B2B / SIGNAGE / PRINT ─────────────────────────────────────────────
+  {name:'Fully Promoted',       sector:'B2B / Promotional Products',  quiz_sector:'b2b',
+   invest:[135,355], royalty:5,  item19:true,  ratio:1.3,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:true, teamSize:'small', models:['office','retail'], experience:['corporate','sales_mktg'],
+   risk:'low', tags:['Tiered royalty','Strong Item 19']},
+
+  {name:'Signarama',            sector:'B2B / Signage & Print',        quiz_sector:'b2b',
+   invest:[245,345], royalty:6,  item19:true,  ratio:1.0,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:true, teamSize:'small', models:['retail','office'], experience:['corporate','sales_mktg'],
+   risk:'low', tags:['B2B sales','Strong Item 19']},
+
+  {name:'FASTSIGNS',            sector:'B2B / Signage',                quiz_sector:'b2b',
+   invest:[191,313], royalty:6,  item19:true,  ratio:1.1,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:true, teamSize:'small', models:['retail','office'], experience:['corporate','sales_mktg'],
+   risk:'low', tags:['Established brand','B2B']},
+
+  {name:'AlphaGraphics',        sector:'B2B / Print & Marketing',      quiz_sector:'b2b',
+   invest:[450,700], royalty:7,  item19:true,  ratio:1.2,
+   involvement:['owner_operator','semi_active'], personality:['D','I','C'],
+   salesDriven:true, teamSize:'small', models:['retail','office'], experience:['corporate','sales_mktg'],
+   risk:'low', tags:['Print & design','Strong support']},
+
+  {name:'PostNet',              sector:'B2B / Shipping & Print',       quiz_sector:'b2b',
+   invest:[175,220], royalty:6,  item19:true,  ratio:1.4,
+   involvement:['owner_operator','semi_active'], personality:['S','C'],
+   salesDriven:false, teamSize:'solo', models:['retail'], experience:['corporate','service'],
+   risk:'low', tags:['Low investment','Simple model']},
+
+  {name:'Minuteman Press',      sector:'B2B / Print',                  quiz_sector:'b2b',
+   invest:[75,130],  royalty:0,  item19:true,  ratio:1.1,
+   involvement:['owner_operator'], personality:['S','C'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['trades','corporate'],
+   risk:'low', tags:['No royalty','Low investment']},
+
+  {name:'ActionCOACH',          sector:'B2B / Business Coaching',      quiz_sector:'b2b',
+   invest:[65,150],  royalty:15, item19:true,  ratio:0.8,
+   involvement:['owner_operator'], personality:['D','I'],
+   salesDriven:true, teamSize:'solo', models:['office','mobile'], experience:['corporate','sales_mktg'],
+   risk:'med', tags:['Pure B2B','Executive model','Very low investment']},
+
+  {name:'The UPS Store',        sector:'B2B / Retail Shipping',        quiz_sector:'b2b',
+   invest:[209,508], royalty:9,  item19:true,  ratio:2.8,
+   involvement:['owner_operator','semi_active'], personality:['S','C'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['corporate','service'],
+   risk:'low', tags:['Iconic brand','Retail location']},
+
+  // ── HOME SERVICES ─────────────────────────────────────────────────────
+  {name:'Mr. Electric',         sector:'Home Services / Electrical',   quiz_sector:'services',
+   invest:[155,353], royalty:5,  item19:true,  ratio:1.4,
+   involvement:['owner_operator','semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['trades','corporate'],
+   risk:'low', tags:['Neighborly system','Essential service','Low investment']},
+
+  {name:'Mosquito Shield',      sector:'Home Services / Pest Control', quiz_sector:'services',
+   invest:[121,150], royalty:8,  item19:true,  ratio:1.2,
+   involvement:['owner_operator','semi_active'], personality:['S','C'],
+   salesDriven:false, teamSize:'solo', models:['mobile'], experience:['trades','service'],
+   risk:'low', tags:['Very low investment','Full P&L disclosed','Seasonal']},
+
+  {name:'1-800-Services',       sector:'Home Services / Plumbing & HVAC', quiz_sector:'services',
+   invest:[154,327], royalty:6,  item19:true,  ratio:3.4,
+   involvement:['owner_operator','semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['trades','corporate'],
+   risk:'med', tags:['Essential services','Multi-territory available']},
+
+  {name:'Five Star Flooring',   sector:'Home Services / Flooring',     quiz_sector:'services',
+   invest:[158,265], royalty:6,  item19:true,  ratio:0.6,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:true, teamSize:'small', models:['mobile','office'], experience:['trades','sales_mktg'],
+   risk:'med', tags:['High margins','Emerging brand','Sales-driven']},
+
+  {name:'Five Star Painting',   sector:'Home Services / Painting',     quiz_sector:'services',
+   invest:[70,100],  royalty:7,  item19:true,  ratio:1.3,
+   involvement:['owner_operator'], personality:['D','I'],
+   salesDriven:true, teamSize:'small', models:['mobile'], experience:['trades','sales_mktg'],
+   risk:'low', tags:['Very low investment','Local marketing']},
+
+  {name:'Molly Maid',           sector:'Home Services / Residential Cleaning', quiz_sector:'services',
+   invest:[110,140], royalty:6,  item19:true,  ratio:1.0,
+   involvement:['semi_active','semi_absentee'], personality:['S','D'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['service','corporate'],
+   risk:'low', tags:['Recurring revenue','Low investment','Service Brands system']},
+
+  {name:'The Cleaning Authority',sector:'Home Services / House Cleaning', quiz_sector:'services',
+   invest:[91,148],  royalty:8,  item19:true,  ratio:1.1,
+   involvement:['semi_active','semi_absentee'], personality:['S','D'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['service','corporate'],
+   risk:'low', tags:['Recurring revenue','Eco-friendly','Very low investment']},
+
+  {name:'Jan-Pro',              sector:'Commercial Cleaning',           quiz_sector:'services',
+   invest:[4,50],    royalty:10, item19:false, ratio:null,
+   involvement:['owner_operator'], personality:['S'],
+   salesDriven:false, teamSize:'solo', models:['mobile'], experience:['service','trades'],
+   risk:'med', tags:['Extremely low entry','B2B commercial','No Item 19']},
+
+  {name:'ServiceMaster Clean',  sector:'Home Services / Cleaning',     quiz_sector:'services',
+   invest:[78,250],  royalty:10, item19:true,  ratio:1.5,
+   involvement:['owner_operator','semi_active'], personality:['S','D'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['service','corporate'],
+   risk:'low', tags:['Iconic brand','Commercial & residential']},
+
+  {name:'Servpro',              sector:'Home Services / Restoration',   quiz_sector:'services',
+   invest:[231,800], royalty:7,  item19:true,  ratio:2.0,
+   involvement:['semi_active','semi_absentee'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['office','mobile'], experience:['trades','corporate'],
+   risk:'low', tags:['Insurance-driven','Recession resistant','Strong brand']},
+
+  {name:'Paul Davis Restoration',sector:'Home Services / Restoration',  quiz_sector:'services',
+   invest:[200,500], royalty:6,  item19:true,  ratio:2.2,
+   involvement:['semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['office','mobile'], experience:['trades','corporate'],
+   risk:'low', tags:['B2B insurance model','Recurring contracts']},
+
+  {name:'Rainbow International', sector:'Home Services / Restoration',  quiz_sector:'services',
+   invest:[125,300], royalty:5,  item19:true,  ratio:1.8,
+   involvement:['owner_operator','semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'small', models:['mobile','office'], experience:['trades','corporate'],
+   risk:'low', tags:['Neighborly system','Low investment']},
+
+  {name:'Window Genie',         sector:'Home Services / Window Cleaning', quiz_sector:'services',
+   invest:[55,150],  royalty:6,  item19:true,  ratio:1.0,
+   involvement:['owner_operator'], personality:['S','D'],
+   salesDriven:false, teamSize:'solo', models:['mobile'], experience:['service','trades'],
+   risk:'low', tags:['Very low investment','Recurring residential']},
+
+  {name:'Aire Serv',            sector:'Home Services / HVAC',          quiz_sector:'services',
+   invest:[135,355], royalty:5,  item19:true,  ratio:1.5,
+   involvement:['owner_operator','semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['trades','corporate'],
+   risk:'low', tags:['Essential service','Neighborly system']},
+
+  {name:'Mr. Rooter Plumbing',  sector:'Home Services / Plumbing',     quiz_sector:'services',
+   invest:[80,200],  royalty:7,  item19:true,  ratio:1.3,
+   involvement:['owner_operator','semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['trades','corporate'],
+   risk:'low', tags:['Neighborly system','Essential service','Low investment']},
+
+  {name:'Lawn Doctor',          sector:'Home Services / Lawn Care',    quiz_sector:'services',
+   invest:[100,140], royalty:9,  item19:true,  ratio:1.2,
+   involvement:['owner_operator','semi_active'], personality:['S','D'],
+   salesDriven:false, teamSize:'solo', models:['mobile'], experience:['trades','service'],
+   risk:'low', tags:['Recurring revenue','Seasonal','Low investment']},
+
+  {name:'1-800-GOT-JUNK?',      sector:'Home Services / Junk Removal', quiz_sector:'services',
+   invest:[140,200], royalty:8,  item19:true,  ratio:1.4,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['service','corporate'],
+   risk:'low', tags:['Iconic brand','Blue-chip consumers','Low investment']},
+
+  {name:'College Hunks Hauling Junk', sector:'Home Services / Junk & Moving', quiz_sector:'services',
+   invest:[96,221],  royalty:7,  item19:true,  ratio:1.5,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['mobile'], experience:['service','corporate'],
+   risk:'low', tags:['Young brand culture','Dual revenue','Low investment']},
+
+  {name:'Two Men and a Truck',  sector:'Home Services / Moving',       quiz_sector:'services',
+   invest:[182,577], royalty:7,  item19:true,  ratio:2.0,
+   involvement:['semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['office','mobile'], experience:['corporate','service'],
+   risk:'low', tags:['Strong brand','B2C moving','Multi-truck scalable']},
+
+  // ── SENIOR CARE ──────────────────────────────────────────────────────
+  {name:'Living Assistance Services', sector:'Senior Care',            quiz_sector:'health',
+   invest:[125,171], royalty:3,  item19:true,  ratio:1.0,
+   involvement:['semi_active','semi_absentee'], personality:['S','C'],
+   salesDriven:false, teamSize:'medium', models:['office'], experience:['service','corporate'],
+   risk:'low', tags:['Lowest royalty','Recession-resistant','Aging tailwind']},
+
+  {name:'Home Instead Senior Care', sector:'Senior Care',             quiz_sector:'health',
+   invest:[125,200], royalty:6,  item19:true,  ratio:1.1,
+   involvement:['semi_active','semi_absentee'], personality:['S','I'],
+   salesDriven:false, teamSize:'medium', models:['office'], experience:['service','corporate'],
+   risk:'low', tags:['Largest in-home care brand','Strong support']},
+
+  {name:'Comfort Keepers',      sector:'Senior Care',                  quiz_sector:'health',
+   invest:[103,152], royalty:6,  item19:true,  ratio:1.0,
+   involvement:['semi_active','semi_absentee'], personality:['S','I'],
+   salesDriven:false, teamSize:'medium', models:['office'], experience:['service','corporate'],
+   risk:'low', tags:['Low investment','Strong brand awareness']},
+
+  {name:'Visiting Angels',      sector:'Senior Care',                  quiz_sector:'health',
+   invest:[80,125],  royalty:4,  item19:true,  ratio:0.9,
+   involvement:['owner_operator','semi_active'], personality:['S','I'],
+   salesDriven:false, teamSize:'medium', models:['office'], experience:['service','corporate'],
+   risk:'low', tags:['Very low investment','Low royalty','Community-focused']},
+
+  {name:'Right at Home',        sector:'Senior Care',                  quiz_sector:'health',
+   invest:[80,150],  royalty:5,  item19:true,  ratio:1.0,
+   involvement:['semi_active','semi_absentee'], personality:['S','I'],
+   salesDriven:false, teamSize:'medium', models:['office'], experience:['service','corporate'],
+   risk:'low', tags:['Low investment','Flexible territory']},
+
+  {name:'Senior Helpers',       sector:'Senior Care',                  quiz_sector:'health',
+   invest:[105,160], royalty:6,  item19:true,  ratio:1.1,
+   involvement:['semi_active'], personality:['S','I'],
+   salesDriven:false, teamSize:'medium', models:['office'], experience:['service','corporate'],
+   risk:'low', tags:['Specialized dementia care','Strong support']},
+
+  // ── CHILDREN'S EDUCATION ─────────────────────────────────────────────
+  {name:'Mathnasium',           sector:"Children's Education / Math",  quiz_sector:'b2b',
+   invest:[127,166], royalty:10, item19:true,  ratio:2.6,
+   involvement:['owner_operator','semi_active'], personality:['C','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'low', tags:['Recession-resistant','Low build-out','Education']},
+
+  {name:'Kumon',                sector:"Children's Education",         quiz_sector:'b2b',
+   invest:[65,145],  royalty:34, item19:true,  ratio:2.0,
+   involvement:['owner_operator'], personality:['S','C'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'low', tags:['Very low investment','Proven globally','Referral-driven']},
+
+  {name:'Sylvan Learning',      sector:"Children's Education / Tutoring", quiz_sector:'b2b',
+   invest:[73,165],  royalty:8,  item19:true,  ratio:2.2,
+   involvement:['owner_operator','semi_active'], personality:['S','C'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'low', tags:['Established brand','Low investment','Community anchor']},
+
+  {name:'Tutor Doctor',         sector:'Education / In-Home Tutoring', quiz_sector:'b2b',
+   invest:[68,108],  royalty:8,  item19:true,  ratio:1.8,
+   involvement:['owner_operator'], personality:['I','S'],
+   salesDriven:false, teamSize:'solo', models:['mobile','office'], experience:['service','corporate'],
+   risk:'low', tags:['Very low investment','Home-based friendly','Education']},
+
+  {name:'Huntington Learning',  sector:"Children's Education",         quiz_sector:'b2b',
+   invest:[124,278], royalty:9,  item19:true,  ratio:2.4,
+   involvement:['owner_operator','semi_active'], personality:['S','C'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'low', tags:['50yr brand','Academic improvement']},
+
+  {name:'The Learning Experience', sector:'Early Childhood Education', quiz_sector:'b2b',
+   invest:[500,1300],royalty:7,  item19:true,  ratio:3.0,
+   involvement:['semi_active'], personality:['S','D'],
+   salesDriven:false, teamSize:'large', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Large investment','Childcare center','Recession-resistant']},
+
+  {name:'Kiddie Academy',       sector:'Early Childhood Education',    quiz_sector:'b2b',
+   invest:[476,850], royalty:7,  item19:true,  ratio:3.2,
+   involvement:['semi_active'], personality:['S','D'],
+   salesDriven:false, teamSize:'large', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Premium childcare','Strong brand']},
+
+  // ── FITNESS & WELLNESS ───────────────────────────────────────────────
+  {name:'Anytime Fitness',      sector:'Fitness / 24-hr Gym',          quiz_sector:'health',
+   invest:[371,770], royalty:5,  item19:true,  ratio:3.5,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['corporate','service'],
+   risk:'med', tags:['Membership model','24/7 access','Scalable']},
+
+  {name:'Retrofitness',         sector:'Budget Fitness / Gym',         quiz_sector:'health',
+   invest:[832,3200],royalty:5,  item19:true,  ratio:6.4,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['corporate','service'],
+   risk:'high', tags:['High investment','Membership model','SSS growth']},
+
+  {name:'Planet Fitness',       sector:'Budget Fitness / Gym',         quiz_sector:'health',
+   invest:[1070,4960],royalty:7, item19:true,  ratio:2.8,
+   involvement:['semi_absentee','investor'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['corporate','service'],
+   risk:'high', tags:['Largest gym brand','Full P&L disclosed','Multi-unit model']},
+
+  {name:'Club Pilates',         sector:'Fitness / Boutique Studio',    quiz_sector:'health',
+   invest:[170,387], royalty:7,  item19:true,  ratio:3.2,
+   involvement:['semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Boutique fitness','Membership model','Growing sector']},
+
+  {name:'Orangetheory Fitness', sector:'Fitness / Group Training',     quiz_sector:'health',
+   invest:[580,1500],royalty:8,  item19:true,  ratio:4.0,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['corporate','service'],
+   risk:'high', tags:['High brand recognition','Membership model']},
+
+  {name:'F45 Training',         sector:'Fitness / Functional Training', quiz_sector:'health',
+   invest:[262,510], royalty:7,  item19:false, ratio:null,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['Celebrity brand','No Item 19','Growing']},
+
+  {name:'Burn Boot Camp',       sector:'Fitness / Group Training',     quiz_sector:'health',
+   invest:[195,330], royalty:6,  item19:true,  ratio:3.0,
+   involvement:['owner_operator','semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Community-driven','Female-focused demographic']},
+
+  {name:'Pure Barre',           sector:'Fitness / Barre Studio',       quiz_sector:'health',
+   invest:[220,410], royalty:7,  item19:true,  ratio:3.5,
+   involvement:['semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Boutique studio','Membership model']},
+
+  {name:'9Round',               sector:'Fitness / Kickboxing',         quiz_sector:'health',
+   invest:[84,150],  royalty:7,  item19:true,  ratio:2.5,
+   involvement:['owner_operator'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Low investment','No class schedule','Simple model']},
+
+  {name:'Snap Fitness',         sector:'Fitness / 24-hr Gym',          quiz_sector:'health',
+   invest:[89,370],  royalty:5,  item19:true,  ratio:3.0,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['corporate','service'],
+   risk:'med', tags:['Low investment','Membership model','Scalable']},
+
+  {name:'The Joint Chiropractic',sector:'Healthcare / Chiropractic',   quiz_sector:'health',
+   invest:[238,400], royalty:7,  item19:true,  ratio:3.8,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Walk-in model','Membership','Growing healthcare']},
+
+  {name:'European Wax Center',  sector:'Wellness / Waxing',            quiz_sector:'health',
+   invest:[369,550], royalty:6,  item19:true,  ratio:3.2,
+   involvement:['semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Membership model','Repeat customers','Beauty sector']},
+
+  {name:'Massage Envy',         sector:'Wellness / Massage',           quiz_sector:'health',
+   invest:[502,1000],royalty:6,  item19:true,  ratio:4.0,
+   involvement:['semi_absentee'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['corporate','service'],
+   risk:'med', tags:['Membership model','High revenue potential']},
+
+  {name:'Hand & Stone Massage', sector:'Wellness / Massage & Facial',  quiz_sector:'health',
+   invest:[490,850], royalty:6,  item19:true,  ratio:3.8,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['corporate','service'],
+   risk:'med', tags:['Membership model','Dual service revenue']},
+
+  // ── QSR / FOOD ───────────────────────────────────────────────────────
+  {name:'Wingstop',             sector:'QSR / Chicken Wings',          quiz_sector:'food',
+   invest:[310,1050],royalty:6,  item19:true,  ratio:2.7,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Fast-growing','$2M avg AUV','Strong unit economics']},
+
+  {name:"Dunkin'",              sector:'QSR / Coffee & Donuts',        quiz_sector:'food',
+   invest:[532,1830],royalty:6,  item19:true,  ratio:13,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Icon brand','Drive-thru','Multi-unit model']},
+
+  {name:'7 Brew Coffee',        sector:'QSR / Coffee Drive-Thru',      quiz_sector:'food',
+   invest:[310,1050],royalty:6,  item19:false, ratio:null,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['Fastest-growing coffee','Drive-thru only','Cult brand']},
+
+  {name:'Jersey Mike\'s Subs',  sector:'QSR / Sandwiches',             quiz_sector:'food',
+   invest:[295,1070],royalty:7,  item19:true,  ratio:4.5,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Strong growth','Fresh-sliced positioning']},
+
+  {name:"Jimmy John's",         sector:'QSR / Sandwiches',             quiz_sector:'food',
+   invest:[329,657], royalty:6,  item19:true,  ratio:3.5,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Speed-focused','Delivery-strong','Established brand']},
+
+  {name:'Firehouse Subs',       sector:'QSR / Sandwiches',             quiz_sector:'food',
+   invest:[350,940], royalty:6,  item19:true,  ratio:4.0,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Community brand','Restaurant Brands system']},
+
+  {name:'Little Caesars',       sector:'QSR / Pizza',                  quiz_sector:'food',
+   invest:[375,1500],royalty:6,  item19:true,  ratio:5.0,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Value positioning','HOT-N-READY model','Scalable']},
+
+  {name:"Marco's Pizza",        sector:'QSR / Pizza',                  quiz_sector:'food',
+   invest:[270,930], royalty:6,  item19:true,  ratio:3.8,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Fastest-growing pizza','Strong delivery model']},
+
+  {name:'Tropical Smoothie Cafe',sector:'QSR / Smoothies & Food',      quiz_sector:'food',
+   invest:[266,590], royalty:6,  item19:true,  ratio:3.5,
+   involvement:['semi_active'], personality:['I','D'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Health-adjacent QSR','Growing daypart']},
+
+  {name:'Smoothie King',        sector:'QSR / Smoothies',              quiz_sector:'food',
+   invest:[265,840], royalty:6,  item19:true,  ratio:3.2,
+   involvement:['semi_active'], personality:['I','D'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Purpose-driven brand','Health positioning']},
+
+  {name:'Subway',               sector:'QSR / Sandwiches',             quiz_sector:'food',
+   invest:[229,562], royalty:8,  item19:false, ratio:null,
+   involvement:['owner_operator'], personality:['S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service'],
+   risk:'high', tags:['No Item 19 (red flag)','Global brand','High fee burden']},
+
+  {name:'Mellow Mushroom',      sector:'Full-Service Restaurant',       quiz_sector:'food',
+   invest:[1330,2050],royalty:7, item19:true,  ratio:10,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'large', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['Iconic brand','High investment','Top-quartile needed']},
+
+  {name:"McDonald's",           sector:'QSR / Burgers',                quiz_sector:'food',
+   invest:[1350,2450],royalty:4, item19:true,  ratio:3.0,
+   involvement:['semi_absentee'], personality:['D','S'],
+   salesDriven:false, teamSize:'large', models:['retail'], experience:['corporate','service'],
+   risk:'low', tags:['Global icon','Lowest royalty in QSR','Multi-unit model']},
+
+  {name:'Popeyes Louisiana Kitchen',sector:'QSR / Chicken',            quiz_sector:'food',
+   invest:[385,3500],royalty:5,  item19:true,  ratio:4.5,
+   involvement:['semi_active'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['Fast-growing QSR','RBI system','High variance range']},
+
+  // ── AUTOMOTIVE ───────────────────────────────────────────────────────
+  {name:'Midas',                sector:'Automotive / Full Service',     quiz_sector:'services',
+   invest:[385,940], royalty:8,  item19:true,  ratio:5.1,
+   involvement:['semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['trades','corporate'],
+   risk:'med', tags:['60yr brand','Royalty incentives yr 1-3','Equipment-heavy']},
+
+  {name:'Jiffy Lube',           sector:'Automotive / Oil Change',       quiz_sector:'services',
+   invest:[265,800], royalty:5,  item19:true,  ratio:4.5,
+   involvement:['semi_active','semi_absentee'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['trades','corporate'],
+   risk:'med', tags:['Fast service model','Shell-owned','High volume']},
+
+  {name:'MAACO',                sector:'Automotive / Collision & Paint',quiz_sector:'services',
+   invest:[280,565], royalty:9,  item19:true,  ratio:4.0,
+   involvement:['semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['trades','corporate'],
+   risk:'med', tags:['Insurance-driven revenue','Collision repair']},
+
+  {name:'Meineke Car Care',     sector:'Automotive / Repair',           quiz_sector:'services',
+   invest:[261,685], royalty:7,  item19:true,  ratio:4.2,
+   involvement:['semi_active'], personality:['D','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['trades','corporate'],
+   risk:'med', tags:['Driven Brands system','Full-service auto']},
+
+  {name:'Christian Brothers Automotive', sector:'Automotive / Repair', quiz_sector:'services',
+   invest:[535,820], royalty:5,  item19:true,  ratio:3.8,
+   involvement:['semi_active'], personality:['S','D'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['trades','corporate'],
+   risk:'med', tags:['Values-based brand','Community focus','Strong support']},
+
+  {name:'Take 5 Oil Change',    sector:'Automotive / Oil Change',       quiz_sector:'services',
+   invest:[245,600], royalty:6,  item19:true,  ratio:3.5,
+   involvement:['semi_active','semi_absentee'], personality:['D','I'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['corporate','service'],
+   risk:'med', tags:['Stay-in-car model','Fast-growing','Driven Brands']},
+
+  // ── PET SERVICES ─────────────────────────────────────────────────────
+  {name:'Tailwaggers',          sector:'Pet Services',                  quiz_sector:'services',
+   invest:[712,1100],royalty:7,  item19:false, ratio:null,
+   involvement:['semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['No Item 19','Growing sector','Early stage']},
+
+  {name:'Dogtopia',             sector:'Pet Services / Dog Daycare',    quiz_sector:'services',
+   invest:[718,1770],royalty:7,  item19:true,  ratio:5.5,
+   involvement:['semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['Growing sector','Membership model','High investment']},
+
+  {name:'Camp Bow Wow',         sector:'Pet Services / Dog Boarding',   quiz_sector:'services',
+   invest:[763,1200],royalty:8,  item19:true,  ratio:5.0,
+   involvement:['semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'medium', models:['retail'], experience:['service','corporate'],
+   risk:'high', tags:['Growing sector','Established brand']},
+
+  {name:'Scenthound',           sector:'Pet Services / Grooming',       quiz_sector:'services',
+   invest:[156,356], royalty:7,  item19:true,  ratio:3.5,
+   involvement:['owner_operator','semi_active'], personality:['I','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['service','corporate'],
+   risk:'med', tags:['Membership model','Lower investment pet','Growing']},
+
+  // ── TECHNOLOGY / SPECIALTY ────────────────────────────────────────────
+  {name:'CPR Cell Phone Repair',sector:'Technology / Repair Services',  quiz_sector:'services',
+   invest:[77,240],  royalty:6,  item19:true,  ratio:2.5,
+   involvement:['owner_operator','semi_active'], personality:['C','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['trades','corporate'],
+   risk:'low', tags:['Low investment','Tech-driven consumer','Omni-channel']},
+
+  {name:'Batteries Plus',       sector:'Specialty Retail / Batteries',  quiz_sector:'b2b',
+   invest:[274,525], royalty:4,  item19:true,  ratio:3.0,
+   involvement:['semi_active'], personality:['C','S'],
+   salesDriven:false, teamSize:'small', models:['retail'], experience:['corporate','sales_mktg'],
+   risk:'low', tags:['Omni-channel','B2B + B2C','Low royalty']},
+
+  {name:'HomeVestors (We Buy Ugly Houses)', sector:'Real Estate / Investment', quiz_sector:'b2b',
+   invest:[75,440],  royalty:5,  item19:true,  ratio:null,
+   involvement:['owner_operator','semi_active'], personality:['D','C'],
+   salesDriven:true, teamSize:'solo', models:['mobile','office'], experience:['corporate','sales_mktg'],
+   risk:'high', tags:['Real estate','Low investment entry','Motivated sellers']},
+
+  {name:'Showhomes',            sector:'Real Estate / Home Staging',    quiz_sector:'services',
+   invest:[65,120],  royalty:7,  item19:false, ratio:null,
+   involvement:['owner_operator'], personality:['I','C'],
+   salesDriven:true, teamSize:'solo', models:['mobile'], experience:['sales_mktg','service'],
+   risk:'high', tags:['Very low investment','Real estate niche','No Item 19']},
+];
+
+// ── SCORING ENGINE (pure algorithm — no API needed) ──────────────────────────
+// Capital ranges in $K
+var CAP_RANGES = {
+  'under150': [0, 150],
+  '150to350': [150, 350],
+  '350to750': [350, 750],
+  '750plus':  [750, 9999]
+};
+
+// Which quiz_sectors map to each sector_interest answer
+var SECTOR_MAP = {
+  'food':     'food',
+  'services': 'services',
+  'health':   'health',
+  'b2b':      'b2b'
+};
+
+// Involvement adjacency (how close two levels are)
+var INVOLVEMENT_LEVELS = ['owner_operator','semi_active','semi_absentee','investor'];
+
+// Risk ordering
+var RISK_LEVELS = ['low','med','high','very_high'];
+var RISK_ANSWER_MAP = {'low':'low','medium':'med','high':'high','very_high':'very_high'};
+
+function scoreMatch(brand, ans) {
+  var score = 0;
+
+  // ── 1. CAPITAL (30 pts) ── Most important filter
+  var capRange = CAP_RANGES[ans.capital] || [0, 9999];
+  var bMin = brand.invest[0];
+  var bMax = brand.invest[1];
+  if (capRange[1] >= bMin && capRange[0] <= bMax) {
+    // Perfect overlap — they can afford this brand
+    score += 30;
+  } else if (capRange[0] > bMax) {
+    // They have more capital than needed — still fine, slight reduction (over-capitalized)
+    score += 22;
+  } else {
+    // They cannot afford this brand
+    score += 0;
+  }
+
+  // ── 2. SECTOR INTEREST (22 pts) ──
+  if (brand.quiz_sector === SECTOR_MAP[ans.sector_interest]) {
+    score += 22;
+  } else {
+    score += 4; // small base score — cross-sector can still be good
+  }
+
+  // ── 3. INVOLVEMENT (15 pts) ──
+  var invIdx = INVOLVEMENT_LEVELS.indexOf(ans.involvement);
+  var bestInvScore = 0;
+  for (var i = 0; i < brand.involvement.length; i++) {
+    var bInvIdx = INVOLVEMENT_LEVELS.indexOf(brand.involvement[i]);
+    var diff = Math.abs(invIdx - bInvIdx);
+    var pts = diff === 0 ? 15 : diff === 1 ? 9 : 3;
+    if (pts > bestInvScore) bestInvScore = pts;
+  }
+  score += bestInvScore;
+
+  // ── 4. PERSONALITY FIT (10 pts) ──
+  if (brand.personality.indexOf(ans.personality) !== -1) {
+    score += 10;
+  } else {
+    score += 4; // all personalities can succeed, some just fit better
+  }
+
+  // ── 5. SALES COMFORT (8 pts) ──
+  var salesScore = 0;
+  if (brand.salesDriven) {
+    if (ans.sales === 'love_sales') salesScore = 8;
+    else if (ans.sales === 'comfortable') salesScore = 6;
+    else if (ans.sales === 'some_training') salesScore = 3;
+    else salesScore = 1;
+  } else {
+    // Not sales-driven — operations & service focus
+    if (ans.sales === 'avoid_sales') salesScore = 8;
+    else if (ans.sales === 'some_training') salesScore = 7;
+    else if (ans.sales === 'comfortable') salesScore = 6;
+    else salesScore = 5; // salespeople can still run operations-focused biz
+  }
+  score += salesScore;
+
+  // ── 6. RISK TOLERANCE (6 pts) ──
+  var ansRisk = RISK_ANSWER_MAP[ans.risk] || 'med';
+  var riskIdx = RISK_LEVELS.indexOf(brand.risk);
+  var ansRiskIdx = RISK_LEVELS.indexOf(ansRisk);
+  var riskDiff = Math.abs(riskIdx - ansRiskIdx);
+  score += riskDiff === 0 ? 6 : riskDiff === 1 ? 4 : 1;
+
+  // ── 7. TEAM SIZE (5 pts) ──
+  var teamMap = {'no_staff':'solo','small_team':'small','medium_team':'medium','large_team':'large'};
+  if (brand.teamSize === teamMap[ans.people]) {
+    score += 5;
+  } else {
+    var teamOrder = ['solo','small','medium','large'];
+    var tDiff = Math.abs(teamOrder.indexOf(brand.teamSize) - teamOrder.indexOf(teamMap[ans.people]));
+    score += tDiff === 1 ? 3 : 1;
+  }
+
+  // ── 8. LOCATION MODEL (4 pts) ──
+  if (ans.location === 'no_pref') {
+    score += 4;
+  } else if (brand.models.indexOf(ans.location) !== -1) {
+    score += 4;
+  } else {
+    score += 1;
+  }
+
+  // BONUS: Item 19 with Analytical personality
+  if (brand.item19 && ans.personality === 'C') score += 1;
+  // BONUS: Very low investment when under $150K
+  if (ans.capital === 'under150' && bMax <= 160) score += 1;
+
+  // Total possible: 30+22+15+10+8+6+5+4+2 = 102 → normalize to 100
+  return Math.min(100, Math.round((score / 102) * 100));
+}
+
+// ── STATE ──
+var currentQ = 0;
+var answers = {};
+var loadTimer = null;
+var lStep = 0;
+
+// ── RENDER QUESTION ──
+function renderQuestion() {
+  var q = QUESTIONS[currentQ];
+  var pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById('progress-label').textContent = 'Question ' + (currentQ+1) + ' of ' + QUESTIONS.length;
+  document.getElementById('progress-count').textContent = pct + '% complete';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  var sel = answers[q.id] || null;
+  var optionsHtml = '';
+  for (var i = 0; i < q.options.length; i++) {
+    var o = q.options[i];
+    var isSelected = sel === o.val;
+    var descHtml = o.desc ? '<div class="opt-desc">' + o.desc + '</div>' : '';
+    optionsHtml += '<label class="opt' + (isSelected ? ' selected' : '') + '" data-qid="' + q.id + '" data-val="' + o.val + '" onclick="selectOption(this)">' +
+      '<div class="opt-radio"></div>' +
+      '<div class="opt-content">' +
+        '<div class="opt-label">' + o.label + '</div>' +
+        descHtml +
+      '</div>' +
+    '</label>';
+  }
+
+  var subHtml = q.sub ? '<div class="q-subtext">' + q.sub + '</div>' : '';
+  var backDisabled = currentQ === 0 ? ' disabled' : '';
+  var nextDisabled = sel ? '' : ' disabled';
+  var nextLabel = currentQ === QUESTIONS.length - 1 ? 'See my matches ✨' : 'Next →';
+
+  document.getElementById('quiz-wrap').innerHTML =
+    '<div class="q-card">' +
+      '<div class="q-card-hdr">' +
+        '<div class="q-category">' + q.category + '</div>' +
+        '<div class="q-text">' + q.text + '</div>' +
+        subHtml +
+      '</div>' +
+      '<div class="q-options">' + optionsHtml + '</div>' +
+      '<div class="q-nav">' +
+        '<button class="btn-back" onclick="prevQuestion()"' + backDisabled + '>← Back</button>' +
+        '<button class="btn-next" id="btn-next" onclick="nextQuestion()"' + nextDisabled + '>' + nextLabel + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function selectOption(el) {
+  var qid = el.getAttribute('data-qid');
+  var val = el.getAttribute('data-val');
+  answers[qid] = val;
+  var opts = document.querySelectorAll('.opt');
+  for (var i = 0; i < opts.length; i++) opts[i].classList.remove('selected');
+  el.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (currentQ < QUESTIONS.length - 1) {
+    currentQ++;
+    renderQuestion();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } else {
+    runAnalysis();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+// ── RUN ANALYSIS ──
+function runAnalysis() {
+  document.getElementById('quiz-wrap').style.display = 'none';
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('loading').classList.add('show');
+
+  var steps = ['ls1','ls2','ls3','ls4','ls5'];
+  lStep = 0;
+  loadTimer = setInterval(function() {
+    for (var i = 0; i < steps.length; i++) {
+      var el = document.getElementById(steps[i]);
+      if (i < lStep)     { el.classList.remove('active'); el.classList.add('done'); }
+      else if (i===lStep){ el.classList.add('active'); el.classList.remove('done'); }
+      else               { el.classList.remove('active','done'); }
+    }
+    lStep = (lStep+1) % (steps.length+1);
+  }, 900);
+
+  // Score all brands
+  var scored = [];
+  for (var i = 0; i < BRANDS.length; i++) {
+    var b = BRANDS[i];
+    var ms = scoreMatch(b, answers);
+    var copy = {};
+    for (var k in b) copy[k] = b[k];
+    copy.matchScore = ms;
+    scored.push(copy);
+  }
+  scored.sort(function(a,b) { return b.matchScore - a.matchScore; });
+
+  setTimeout(function() {
+    clearInterval(loadTimer);
+    document.getElementById('loading').classList.remove('show');
+    renderResults(scored);
+  }, 4500);
+}
+
+// ── BUILD PROFILE ──
+function buildProfile() {
+  var p = answers.personality;
+  var inv = answers.involvement;
+
+  var profiles = {
+    'D_owner_operator':'The Driven Operator',
+    'D_semi_active':   'The Growth Investor',
+    'D_semi_absentee': 'The Strategic Acquirer',
+    'D_investor':      'The Franchise Portfolio Builder',
+    'I_owner_operator':'The Sales-First Owner',
+    'I_semi_active':   'The Brand Builder',
+    'I_semi_absentee': 'The Relationship Investor',
+    'I_investor':      'The Franchise Ambassador',
+    'S_owner_operator':'The Systems Manager',
+    'S_semi_active':   'The Steady Builder',
+    'S_semi_absentee': 'The Reliable Investor',
+    'S_investor':      'The Consistent Cash Flow Investor',
+    'C_owner_operator':'The Detail-Driven Owner',
+    'C_semi_active':   'The Analytical Operator',
+    'C_semi_absentee': 'The Research-First Investor',
+    'C_investor':      'The Data-Driven Portfolio Builder',
+  };
+
+  var key = p + '_' + inv;
+  var title = profiles[key] || 'The Franchise Investor';
+
+  var taglines = {
+    D: "You're decisive, competitive, and goal-driven. You thrive in franchises that reward hustle and let you set the pace.",
+    I: 'You build relationships and sell naturally. B2B and customer-facing franchises are where your personality creates the biggest advantage.',
+    S: 'You follow systems reliably and build loyal teams. Franchise models that reward consistency and quality suit you well.',
+    C: 'You research thoroughly and demand quality. Franchises with strong data, clear systems, and transparent financials are your sweet spot.',
+  };
+
+  return { title: title, tagline: taglines[p] || 'You have a well-rounded profile that opens up multiple franchise paths.' };
+}
+
+// ── SECTOR AGGREGATION ──
+function getSectorMatches(scored) {
+  var sectorScores = {};
+  for (var i = 0; i < scored.length; i++) {
+    var b = scored[i];
+    var s = b.sector.split('/')[0].trim();
+    if (!sectorScores[s]) sectorScores[s] = {total:0,count:0};
+    sectorScores[s].total += b.matchScore;
+    sectorScores[s].count++;
+  }
+
+  var sectors = [];
+  for (var name in sectorScores) {
+    sectors.push({
+      name: name,
+      avgScore: Math.round(sectorScores[name].total / sectorScores[name].count)
+    });
+  }
+  sectors.sort(function(a,b){ return b.avgScore - a.avgScore; });
+  sectors = sectors.slice(0,6);
+
+  var icons = {
+    'B2B':'💼','Home Services':'🔧','Budget Fitness':'💪','QSR':'🍔',
+    'Senior Care':'❤️',"Children's Education":'📚','Automotive':'🚗',
+    'Pet Services':'🐾','Full-Service Restaurant':'🍕','Fitness':'💪',
+    'Wellness':'✨','Healthcare':'🏥','Commercial Cleaning':'🧹',
+    'Specialty Retail':'🏪','Technology':'📱','Real Estate':'🏠',
+    'Early Childhood Education':'🎒','Education':'📚'
+  };
+
+  for (var i = 0; i < sectors.length; i++) {
+    sectors[i].icon = icons[sectors[i].name] || '🏢';
+  }
+  return sectors;
+}
+
+// ── WHY THIS BRAND ──
+function getBrandWhy(brand) {
+  var p = answers.personality;
+  var reasons = [];
+  if (brand.matchScore >= 85) reasons.push('Highly compatible across all profile dimensions');
+  else if (brand.matchScore >= 75) reasons.push('Strong match with your investor profile');
+  if (brand.item19) reasons.push('Transparent financials — Item 19 disclosed');
+  if (brand.ratio && brand.ratio < 3) reasons.push('Excellent capital efficiency ratio');
+  if (p === 'C' && brand.item19) reasons.push('Full financial transparency for your Analytical style');
+  if (p === 'D' && brand.salesDriven) reasons.push('Sales-driven model rewards your Driver personality');
+  if (p === 'S' && brand.quiz_sector === 'health') reasons.push('Care-focused model aligns with your Steady personality');
+  if (p === 'I' && (brand.quiz_sector === 'b2b' || brand.quiz_sector === 'food')) reasons.push('Customer-facing model suits your Influencer style');
+  if (brand.risk === 'low') reasons.push('Low-risk profile with proven track record');
+  if (answers.involvement === 'semi_absentee' && brand.involvement.indexOf('semi_absentee') !== -1) reasons.push('Supports semi-absentee ownership model');
+  return reasons.slice(0,2).join(' · ') || 'Solid match across your profile dimensions';
+}
+
+// ── ADVICE CARDS ──
+function getAdvice() {
+  var cards = [];
+  var p = answers.personality;
+  var c = answers.capital;
+  var inv = answers.involvement;
+
+  var persAdvice = {
+    D:{icon:'⚡',title:'Leverage your Driver personality',body:'Franchises where you can set aggressive sales goals and compete against your own benchmarks will energize you. Look for B2B models where your decisiveness becomes a revenue-generating advantage.'},
+    I:{icon:'🤝',title:'Your network is your asset',body:"You'll outperform in franchises that reward relationship-building. Prioritize concepts where you can build a loyal client base — B2B services and branded retail both suit you well."},
+    S:{icon:'⚙️',title:'Follow the system — it\'s your superpower',body:"Your reliability and consistency are exactly what franchisors want. Pick a brand with a proven, detailed operations manual and strong ongoing support. You'll thrive when the system is solid."},
+    C:{icon:'📊',title:'Demand full financial transparency',body:'Only invest in brands with strong Item 19 disclosures. Your analytical nature means you need real data to make decisions — brands that hide their financials are a red flag for you specifically.'},
+  };
+  if (persAdvice[p]) cards.push(persAdvice[p]);
+
+  if (c === 'under150' || c === '150to350') {
+    cards.push({icon:'💡',title:'Low-investment brands are your sweet spot',body:'Service-based and B2B franchises in your range often produce the best capital efficiency ratios. Avoid heavy build-out concepts — your budget works harder in mobile or light-commercial models.'});
+  } else {
+    cards.push({icon:'📈',title:'Your budget opens premium opportunities',body:'With your capital range, you can access higher-revenue concepts. Prioritize brands with strong Item 19 data and proven top-quartile performance to justify the larger investment.'});
+  }
+
+  if (inv === 'semi_absentee' || inv === 'investor') {
+    cards.push({icon:'👥',title:'Hiring the right GM is critical',body:'Semi-absentee ownership lives or dies on your general manager. Budget for strong management compensation from day one. Franchises with robust training systems make this much easier.'});
+  } else {
+    cards.push({icon:'🎯',title:'Your hands-on approach is an advantage',body:'Owner-operators consistently outperform absentee owners in the same franchise system. Your involvement builds culture, catches problems early, and drives franchisee retention.'});
+  }
+
+  cards.push({icon:'⚠️',title:'Watch the total fee burden',body:'The royalty rate alone does not tell the story. Add up royalty + ad fund + required local marketing + tech fees. Anything over 12% of gross revenue creates serious margin pressure regardless of brand strength.'});
+
+  return cards.slice(0,4);
+}
+
+// ── FORMAT INVEST ──
+function fmtInvest(invest) {
+  var min = invest[0];
+  var max = invest[1];
+  function fmt(n) {
+    if (n >= 1000) return '$' + (n/1000).toFixed(1).replace('.0','') + 'M';
+    return '$' + n + 'K';
+  }
+  return fmt(min) + ' – ' + fmt(max);
+}
+
+// ── RENDER RESULTS ──
+function renderResults(scored) {
+  var resultsEl = document.getElementById('results');
+  resultsEl.style.display = 'flex';
+  resultsEl.classList.add('show');
+
+  var profile = buildProfile();
+  var sectors = getSectorMatches(scored);
+  var top8 = scored.slice(0, 8);
+
+  var capLabels = {'under150':'Under $150K','150to350':'$150K–$350K','350to750':'$350K–$750K','750plus':'$750K+'};
+  var persLabels = {D:'Driver (D)',I:'Influencer (I)',S:'Steady (S)',C:'Analytical (C)'};
+  var invLabels  = {owner_operator:'Owner-operator',semi_active:'Semi-active',semi_absentee:'Semi-absentee',investor:'Pure investor'};
+
+  var capLabel  = capLabels[answers.capital]      || '';
+  var persLabel = persLabels[answers.personality] || '';
+  var invLabel  = invLabels[answers.involvement]  || '';
+  var topBrand  = scored[0];
+  var topSector = sectors[0];
+
+  // Affordable brands count
+  var affordableCount = 0;
+  var capRange = CAP_RANGES[answers.capital] || [0,9999];
+  for (var i = 0; i < BRANDS.length; i++) {
+    if (BRANDS[i].invest[0] <= capRange[1] && BRANDS[i].invest[1] >= capRange[0]) affordableCount++;
+  }
+
+  // Build HTML in parts to avoid deeply nested strings
+  var html = '';
+
+  // Profile Card
+  html += '<div class="profile-card">';
+  html += '<div class="profile-eyebrow">Your franchise investor profile</div>';
+  html += '<div class="profile-title">' + profile.title + '</div>';
+  html += '<div class="profile-tagline">' + profile.tagline + '</div>';
+  html += '<div class="profile-tags">';
+  html += '<span class="ptag">' + capLabel + '</span>';
+  html += '<span class="ptag">' + persLabel + ' personality</span>';
+  html += '<span class="ptag">' + invLabel + '</span>';
+  if (topSector) html += '<span class="ptag">' + topSector.name + ' best fit</span>';
+  html += '</div>';
+  html += '<div class="score-row">';
+  html += '<div class="score-tile"><div class="score-tile-lbl">Top match</div><div class="score-tile-val">' + (topBrand ? topBrand.name : '—') + '</div><div class="score-tile-sub">' + (topBrand ? topBrand.matchScore : 0) + '% fit score</div></div>';
+  html += '<div class="score-tile"><div class="score-tile-lbl">Best sector</div><div class="score-tile-val">' + (topSector ? topSector.name : '—') + '</div><div class="score-tile-sub">' + (topSector ? topSector.avgScore : 0) + '% avg fit</div></div>';
+  html += '<div class="score-tile"><div class="score-tile-lbl">Brands in range</div><div class="score-tile-val">' + affordableCount + '</div><div class="score-tile-sub">match your budget</div></div>';
+  html += '<div class="score-tile"><div class="score-tile-lbl">Total analyzed</div><div class="score-tile-val">' + BRANDS.length + '</div><div class="score-tile-sub">across ' + sectors.length + ' sectors</div></div>';
+  html += '</div></div>';
+
+  // Sector Matches
+  html += '<div class="panel"><div class="panel-hdr"><div class="panel-ico" style="background:#faeeda">🎯</div><span class="panel-title">Best-fit franchise sectors for your profile</span></div>';
+  html += '<div class="sector-grid">';
+  for (var i = 0; i < sectors.length; i++) {
+    var s = sectors[i];
+    html += '<div class="sector-card' + (i===0?' top':'') + '">';
+    if (i===0) html += '<span class="sector-top-badge">Best match</span>';
+    html += '<div class="sector-icon">' + s.icon + '</div>';
+    html += '<div class="sector-name">' + s.name + '</div>';
+    html += '<div class="sector-desc">Avg compatibility across brands in database</div>';
+    html += '<div class="sector-match"><div class="match-bar-track"><div class="match-bar-fill" style="width:' + s.avgScore + '%"></div></div><span class="match-pct">' + s.avgScore + '%</span></div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+
+  // Top Brand Matches
+  html += '<div class="panel"><div class="panel-hdr"><div class="panel-ico" style="background:#e8efe7">🏆</div><span class="panel-title">Your top franchise matches — ranked by fit</span></div>';
+  html += '<ul class="brand-list">';
+  for (var i = 0; i < top8.length; i++) {
+    var b = top8[i];
+    var rankClass = i===0?'r1':i===1?'r2':i===2?'r3':'rx';
+    var investStr = fmtInvest(b.invest);
+    var why = getBrandWhy(b);
+    html += '<li class="brand-item">';
+    html += '<div class="brand-rank ' + rankClass + '">' + (i+1) + '</div>';
+    html += '<div class="brand-info">';
+    html += '<div class="brand-name">' + b.name + '</div>';
+    html += '<div class="brand-sector">' + b.sector + '</div>';
+    html += '<div class="brand-why">' + why + '</div>';
+    html += '<div class="brand-meta">';
+    html += '<span class="bmeta">' + investStr + '</span>';
+    html += '<span class="bmeta">' + b.royalty + '% royalty</span>';
+    html += '<span class="bmeta">' + (b.item19 ? '✓ Item 19 disclosed' : '⚠ No Item 19') + '</span>';
+    if (b.ratio) html += '<span class="bmeta">Cap ratio: ' + b.ratio + 'x</span>';
+    html += '</div></div>';
+    html += '<div class="brand-score"><div class="brand-score-num">' + b.matchScore + '%</div><div class="brand-score-lbl">fit</div></div>';
+    html += '</li>';
+  }
+  html += '</ul></div>';
+
+  // Advice
+  var advice = getAdvice();
+  html += '<div class="panel"><div class="panel-hdr"><div class="panel-ico" style="background:#e8f0f8">💡</div><span class="panel-title">Personalized advice for your profile</span></div>';
+  html += '<div class="advice-grid">';
+  for (var i = 0; i < advice.length; i++) {
+    var a = advice[i];
+    html += '<div class="advice-card"><div class="advice-icon">' + a.icon + '</div><div class="advice-title">' + a.title + '</div><div class="advice-body">' + a.body + '</div></div>';
+  }
+  html += '</div></div>';
+
+  // Next Steps
+  var steps = [
+    ['📄',"Analyze your top match's FDD",'Upload the FDD for ' + (topBrand?topBrand.name:'your top match') + ' to the FranchiseIQ analyzer for a full 23-item analysis, EBITDA calculation, and investment score.'],
+    ['💰','Run the investment calculator','Model your specific scenario — your capital, your local rent, your revenue expectations — to get a realistic payback timeline.'],
+    ['❓','Generate your franchisee questions','Use the question generator to create a personalized interview list for ' + (topBrand?topBrand.name:'your top match') + ' franchisees based on their specific FDD.'],
+    ['📞','Contact 8–12 existing franchisees','Request the franchisee contact list from Item 20 of the FDD. Ask every franchisee: "Knowing what you know today, would you invest again?"'],
+  ];
+  html += '<div class="panel"><div class="panel-hdr"><div class="panel-ico" style="background:#f2ede4">🚀</div><span class="panel-title">Your next steps</span></div>';
+  html += '<div style="padding:1.25rem;display:flex;flex-direction:column;gap:.75rem">';
+  for (var i = 0; i < steps.length; i++) {
+    var st = steps[i];
+    html += '<div style="display:flex;gap:12px;padding:.875rem 1rem;background:var(--cream);border-radius:var(--r)">';
+    html += '<span style="font-size:18px;flex-shrink:0;margin-top:2px">' + st[0] + '</span>';
+    html += '<div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px">' + st[1] + '</div>';
+    html += '<div style="font-size:12px;color:rgba(15,14,12,.55);line-height:1.55">' + st[2] + '</div></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  html += '<div class="export-strip">';
+  html += '<button class="btn btn-primary" onclick="copyResults()">📋 Copy my results</button>';
+  html += '<button class="btn btn-outline" onclick="retakeQuiz()">↺ Retake quiz</button>';
+  html += '</div>';
+  html += '<div class="disclaimer">FranchiseIQ Fit Quiz — for informational purposes only. Match scores are based on general profile compatibility, not guaranteed returns. Always conduct full due diligence, review the complete FDD, and consult a qualified franchise attorney before making any investment decision.</div>';
+  html += '</div>';
+
+  // Email Capture
+  html += '<div class="email-capture">';
+  html += '<h3>Get your full franchise report</h3>';
+  html += '<p>Enter your email to receive your complete match results, personalized due diligence checklist, and the top questions to ask franchisees — free.</p>';
+  html += '<div class="email-form">';
+  html += '<input type="email" class="email-input" id="email-input" placeholder="your@email.com">';
+  html += '<button class="btn-email" onclick="submitEmail()">Send my report</button>';
+  html += '</div>';
+  html += '<div class="email-note" id="email-note">No spam. Unsubscribe anytime.</div>';
+  html += '</div>';
+
+  resultsEl.innerHTML = html;
+  resultsEl.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function submitEmail() {
+  var email = document.getElementById('email-input').value;
+  if (!email || email.indexOf('@') === -1) {
+    document.getElementById('email-note').textContent = 'Please enter a valid email address.';
+    document.getElementById('email-note').style.color = '#c0392b';
+    return;
+  }
+  document.getElementById('email-note').textContent = '✓ Got it! Your report is on its way.';
+  document.getElementById('email-note').style.color = 'var(--gold)';
+  document.getElementById('email-input').disabled = true;
+  document.querySelector('.btn-email').disabled = true;
+  document.querySelector('.btn-email').textContent = 'Sent!';
+}
+
+function copyResults() {
+  var lines = ['FranchiseIQ Fit Quiz Results', '='.repeat(40)];
+  var capLabels = {'under150':'Under $150K','150to350':'$150K-$350K','350to750':'$350K-$750K','750plus':'$750K+'};
+  lines.push('Capital: ' + (capLabels[answers.capital] || answers.capital));
+  lines.push('Personality: ' + answers.personality);
+  lines.push('Involvement: ' + answers.involvement);
+  lines.push('Sector: ' + answers.sector_interest);
+  lines.push('');
+  lines.push('Top Brand Matches:');
+
+  // Re-score to get fresh results for copy
+  var scored = [];
+  for (var i = 0; i < BRANDS.length; i++) {
+    var copy = {};
+    for (var k in BRANDS[i]) copy[k] = BRANDS[i][k];
+    copy.matchScore = scoreMatch(BRANDS[i], answers);
+    scored.push(copy);
+  }
+  scored.sort(function(a,b){ return b.matchScore - a.matchScore; });
+  for (var i = 0; i < Math.min(8, scored.length); i++) {
+    var b = scored[i];
+    lines.push((i+1) + '. ' + b.name + ' (' + b.matchScore + '% fit) — ' + b.sector);
+  }
+
+  var txt = lines.join('\n');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(function() {
+      var btn = document.querySelector('.btn-primary');
+      if (btn) { btn.textContent = '✓ Copied!'; setTimeout(function(){ btn.textContent = '📋 Copy my results'; }, 2000); }
+    });
+  }
+}
+
+function retakeQuiz() {
+  currentQ = 0;
+  answers = {};
+  var r = document.getElementById('results');
+  r.style.display = 'none';
+  r.classList.remove('show');
+  r.innerHTML = '';
+  document.getElementById('quiz-wrap').style.display = '';
+  document.getElementById('progress-wrap').style.display = '';
+  renderQuestion();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── INIT ──
+renderQuestion();
+</script>
+</body>
+</html>
